@@ -1,0 +1,11 @@
+.idea/
+venv/
+*.egg-info/
+dist/
+_versions/
+data/dota2_heroes_stats
+_older/
+.env
+logs*.log*
+handlers\users\pick_tempfiles\
+data/heroes_meta.json
