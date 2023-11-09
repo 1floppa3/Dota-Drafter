@@ -6,19 +6,18 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import ParseMode
 from loguru import logger
 
-from config import BOT_LINK, COUNTERPICK_NUM
-from data.dota2_heroes import DOTA2_HEROES
+from data import config, dota2
 from filters import UserCommand
+from keyboards.pick_helper import get_ikb_wronghero, ikb_allowed_heroes, replace_hero_cb_data, remove_hero_cb_data
+from loader import dp
+from services.db_commands import subscription as db_sub
+from services.db_commands import users as db_users
 from states import WrongHeroState
 from states.pick_states import WaitForHeroesState
 from utils import split_words
 from utils.dotabuff import find_counter_picks, check_valid_heroes, match_hero_name
 from utils.exceptions import NotEnoughHeroesToAnalyze, WrongHero, TooManyHeroesToAnalyze
-from keyboards.pick_helper import get_ikb_wronghero, ikb_allowed_heroes, replace_hero_cb_data, remove_hero_cb_data
-from loader import dp
 from utils.misc.throttling import rate_limit
-from services.db_commands import users as db_users
-from services.db_commands import subscription as db_sub
 
 
 @rate_limit(1, 'pick')
@@ -29,7 +28,7 @@ async def command_pick(message: types.Message, state: FSMContext):
         pick_commands_left = await db_users.get_user_max_picks_per_day(message.from_user.id)
         if pick_commands_left <= 0:
             await message.answer('🙁 Вы исчерпали лимит бесплатных пиков за сегодня.\n'
-                                 'Возвращайтесь завтра или купите подписку и пользуйтесь ботом бесконечно :)')
+                                 'Возвращайтесь завтра или купите подписку и пользуйтесь ботом бесконечно')
             return
 
     if message.text == "👀 Контрпикнуть команду":
@@ -101,7 +100,7 @@ async def proccess_pick_command(message: types.Message, heroes: list[str], state
 @dp.callback_query_handler(replace_hero_cb_data.filter())
 async def replace_wrong_hero_callback(call: types.CallbackQuery, state: FSMContext, callback_data: dict):
     filename = callback_data['filename']
-    path = Path(f"handlers/users/pick_tempfiles/{filename}")
+    path = Path(f"temp/pick/{filename}")
     try:
         with open(path, 'r') as file:
             data = json.load(file)
@@ -133,7 +132,7 @@ async def set_new_name(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(remove_hero_cb_data.filter())
 async def remove_wrong_hero_callback(call: types.CallbackQuery, callback_data: dict, state: FSMContext):
     filename = callback_data['filename']
-    path = Path(f"handlers/users/pick_tempfiles/{filename}")
+    path = Path(f"temp/pick/{filename}")
     try:
         with open(path, 'r') as file:
             data = json.load(file)
@@ -172,20 +171,20 @@ async def create_answer(counter_picks: list, heroes: list, user_id: int) -> str:
 
     for picks in picks_by_pos:
         best_picks = list(filter(
-            lambda pick: any(pick[0] == data[1] and picks[0] in data[0] for data in DOTA2_HEROES.values()),
-            counter_picks))[:COUNTERPICK_NUM]
+            lambda pick: any(pick[0] == data[1] and picks[0] in data[0] for data in dota2.heroes.values()),
+            counter_picks))[:config.COUNTERPICK_NUM]
         if len(best_picks):
             answer += f"\n<i>Топ контр-пик {picks[1]}:</i>\n"
             for name, lose_rate in best_picks:
-                answer += (f"<a href='https://t.me/{BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: "
+                answer += (f"<a href='https://t.me/{config.BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: "
                            f"{round(lose_rate * 5, 2)}%\n")
 
     if len(answer):
         user_heroes = list(set(heroes))
         temp = []
-        for url_name, data in DOTA2_HEROES.items():
+        for url_name, data in dota2.heroes.items():
             if url_name in user_heroes:
-                temp.append(f"<a href='https://t.me/{BOT_LINK[1:]}?start={url_name}'>{data[1].strip()}</a>")
+                temp.append(f"<a href='https://t.me/{config.BOT_LINK[1:]}?start={url_name}'>{data[1].strip()}</a>")
         user_heroes = temp
 
         if not await db_sub.is_user_sub(user_id):

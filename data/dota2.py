@@ -1,4 +1,6 @@
-DOTA2_HEROES = {
+patch = '7.34d'
+
+heroes = {
     'abaddon': ['34', 'Abaddon', 'abadon', 'abodon', 'aboddon', 'abaddon', 'абадон', 'абодон', 'ободон', 'обадон'],
     'alchemist': ['123', 'Alchemist', 'алхимик', 'химик', 'алхимион', 'алхимон', 'alchem', 'alchim',
                   'alchimist'],

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from aiogram import types
 
-from data.dota2_heroes import DOTA2_HEROES
+from data import dota2
 from filters import AdminCommand
 from loader import dp
 from utils.dotabuff import parse_meta_data, parse_hero_data
@@ -29,5 +29,5 @@ async def command_parse_heroes_meta(message: types.Message):
 
 
 def parse_all_heroes_data():
-    for hero in DOTA2_HEROES.keys():
+    for hero in dota2.heroes.keys():
         parse_hero_data(hero)

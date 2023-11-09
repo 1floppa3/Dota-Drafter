@@ -4,8 +4,7 @@ venv/
 dist/
 _versions/
 data/dota2_heroes_stats
-_older/
+temp/
 .env
 logs*.log*
-handlers\users\pick_tempfiles\
 data/heroes_meta.json

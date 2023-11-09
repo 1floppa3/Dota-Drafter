@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import ParseMode, InputFile
 from loguru import logger
 
-from data.dota2_heroes import DOTA2_HEROES
+from data import dota2
 from filters import UserCommand, SubscriberCommand
 from loader import dp
 from states import TeamPickState
@@ -82,7 +82,7 @@ async def heroes_handler(message: types.Message, state: FSMContext, first_step: 
 
                 temp1 = []
                 temp2 = []
-                for url_name, data in DOTA2_HEROES.items():
+                for url_name, data in dota2.heroes.items():
                     if url_name in first_team:
                         temp1.append(f"<code>{data[1].strip()}</code>")
                     if url_name in second_team:

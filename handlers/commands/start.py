@@ -1,9 +1,8 @@
 from aiogram import types
-from aiogram.types import ParseMode, InputFile
+from aiogram.types import ParseMode
 from loguru import logger
 
-from data.dota2_heroes import DOTA2_HEROES
-from data.messages import START_MESSAGE
+from data import config, dota2
 from filters import UserCommand
 from handlers.commands.hero_data import hook_argument_hero_data
 from keyboards.menu import kb_main_menu
@@ -16,9 +15,20 @@ from utils.misc.throttling import rate_limit
 async def command_start(message: types.Message):
     args = message.get_args()
     if args != "":
-        if args in DOTA2_HEROES.keys():
+        if args in dota2.heroes.keys():
             await hook_argument_hero_data(message, args)
     else:
         logger.info(f"{message.from_user.full_name} (@{message.from_user.username}) /start")
         kb = await kb_main_menu(message.from_user.id)
-        await message.answer(START_MESSAGE, parse_mode=ParseMode.HTML, reply_markup=kb)
+
+        text = (
+            f"<b>{config.BOT_NAME.upper()} BOT</b>\n"
+            "\n"
+            "Бот-помощник для поднятия рейтинга в Dota 2\n"
+            "\n"
+            "<b><i>🔍 Помощь: /help</i></b>\n"
+            "\n"
+            f"<b>Канал бота: {config.CHANNEL_LINK}</b>"
+        )
+
+        await message.answer(text, parse_mode=ParseMode.HTML, reply_markup=kb)

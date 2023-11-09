@@ -2,6 +2,8 @@ import os
 
 from dotenv import load_dotenv
 
+from data import dota2
+
 load_dotenv()
 
 # General
@@ -16,13 +18,10 @@ BOT_ADMINS = [
     '509056798'  # floppa
 ]
 
-DOTA2_PATCH = "7.34d"  #
-
 # Links
 CHANNEL_LINK = "@dotadrafter"
 BOT_LINK = "@testfloppa13bot"  # поменять
 HERO_NAMES_URL_LINK = "https://telegra.ph/Aliasy-k-nazvaniyam-geroev-DOTA-DRAFTER-11-03"
-
 
 # Misc
 SUBSCRIBER_CHECK = {
@@ -33,7 +32,7 @@ BOT_COMMANDS = {
     'help': 'Помощь',
     'profile': 'Профиль',
     'pick': 'Контрпикнуть команду',
-    'meta': f'Мета ({DOTA2_PATCH})',
+    'meta': f'Мета ({dota2.patch})',
     'heroes': 'Список героев',
     'sub': 'Инфо о подписке'
 }
@@ -42,6 +41,11 @@ COUNTERPICK_NUM = 7  # Count of counterpicks of each role on '/pick' command
 PICKS_PER_DAY = 5  # Maximum picks per day for average user
 WINRATE_TOP_NUM = 10  # Count of heroes in Winrate meta
 FREQUENCY_TOP_NUM = 10  # Count of heroes in Frequency meta
+
+# Subscription
+SUBSCRIBTION_COST_RUB = 199
+SUBSCRIBTION_COST_USD = 2
+SUBSCRIBTION_COST_MESSAGE = f"{SUBSCRIBTION_COST_USD}$ ({SUBSCRIBTION_COST_RUB}₽) / мес"
 
 # Database
 DATABASE = {

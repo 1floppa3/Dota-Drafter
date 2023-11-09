@@ -5,7 +5,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.exceptions import ValidationError
 from loguru import logger
 
-import config
+from data import config
 from services.database import db
 
 try:

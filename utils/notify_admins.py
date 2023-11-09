@@ -1,8 +1,7 @@
+from aiogram import Dispatcher, types
 from loguru import logger
 
-from aiogram import Dispatcher, types
-
-import config
+from data import config
 
 
 async def log_to_admins(dp: Dispatcher, message: str):

@@ -1,14 +1,14 @@
 from aiogram import types
+from aiogram.types import ParseMode
+from loguru import logger
 
+import services.db_commands.subscription as db_sub
+import services.db_commands.users as db_users
+from data import config
 from filters import UserCommand
 from keyboards.payment import get_ikb_payment
 from loader import dp
-import services.db_commands.subscription as db_sub
-import services.db_commands.users as db_users
-from utils import text
 from utils.misc.throttling import rate_limit
-
-SUBSCRIBTION_COST = 249
 
 
 @rate_limit(1, 'profile')
@@ -26,23 +26,18 @@ async def command_profile(message: types.Message):
     created_at_date = await db_users.get_user_created_date(user_id)
     created_at = created_at_date.strftime("%d/%m/%Y")
 
-    answer = text(
-        f"👤 Имя: {message.from_user.full_name}",
-        f"🏷 UID: {user_id}",
-        "",
-        f"📅 Начался пользоваться ботом: {created_at}",
-        f"Отправлено команд боту: {await db_users.get_user_command_count(user_id)}",
-        "",
-        f"Осталось бесплатных пиков сегодня: {await db_users.get_user_max_picks_per_day(user_id)}",
-        f"💵 Подписка: {sub_expires_date}"
-    )
+    text = (f"👤 Имя: {message.from_user.full_name}\n"
+            f"📅 Начался пользоваться ботом: {created_at}\n"
+            "\n"
+            f"<i>Отправлено команд боту: <b>{await db_users.get_user_command_count(user_id)}\n</b></i>"
+            f"<i>Осталось бесплатных пиков сегодня: <b>{await db_users.get_user_max_picks_per_day(user_id)}\n</b></i>"
+            "\n"
+            f"<i>💵 Подписка: <b>{sub_expires_date}</b> (/sub)</i>")
 
     if not await db_sub.is_user_sub(user_id):
-        await message.answer(answer, reply_markup=get_ikb_payment(SUBSCRIBTION_COST))
+        await message.answer(text, parse_mode=ParseMode.HTML,
+                             reply_markup=get_ikb_payment(config.SUBSCRIBTION_COST_MESSAGE))
     else:
-        await message.answer(answer)
+        await message.answer(text, parse_mode=ParseMode.HTML)
 
-
-@dp.callback_query_handler(text='payment')
-async def callback_payment(call: types.CallbackQuery):
-    await call.message.answer('Оформление платежа')
+    logger.info(f"{message.from_user.full_name} (@{message.from_user.username}) /profile")

@@ -2,8 +2,7 @@ from aiogram import types
 from aiogram.types import ParseMode, InputFile
 from loguru import logger
 
-from config import DOTA2_PATCH, BOT_LINK, WINRATE_TOP_NUM, FREQUENCY_TOP_NUM
-from data.dota2_heroes import DOTA2_HEROES
+from data import config, dota2
 from filters import UserCommand
 from loader import dp
 from utils.dotabuff import match_hero_name, parse_meta_data
@@ -11,7 +10,7 @@ from utils.misc.throttling import rate_limit
 
 
 @rate_limit(1, 'meta')
-@dp.message_handler(UserCommand(), text=f"🔝 Мета ({DOTA2_PATCH})")
+@dp.message_handler(UserCommand(), text=f"🔝 Мета ({dota2.patch})")
 @dp.message_handler(UserCommand(), commands=['meta'])
 async def command_meta(message: types.Message):
     meta = parse_meta_data()
@@ -23,25 +22,25 @@ async def command_meta(message: types.Message):
     answer = "<b>Текущая мета персонажей:</b>\n"
 
     answer += "\n<i>По винрейту (Winrate)</i>\n"
-    for name, value in winrate_top[:WINRATE_TOP_NUM]:
-        answer += (f"<a href='https://t.me/{BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: "
+    for name, value in winrate_top[:config.WINRATE_TOP_NUM]:
+        answer += (f"<a href='https://t.me/{config.BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: "
                    f"{round(value[0], 2)}%\n")
     answer += '...\n'
-    for name, value in reversed(list(reversed(winrate_top))[:WINRATE_TOP_NUM // 2]):
-        answer += (f"<a href='https://t.me/{BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: "
+    for name, value in reversed(list(reversed(winrate_top))[:config.WINRATE_TOP_NUM // 2]):
+        answer += (f"<a href='https://t.me/{config.BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: "
                    f"{round(value[0], 2)}%\n")
 
     answer += "\n<i>По частоте выбора (Frequency)</i>\n"
-    for name, value in pick_freq_top[:FREQUENCY_TOP_NUM]:
-        answer += (f"<a href='https://t.me/{BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: "
+    for name, value in pick_freq_top[:config.FREQUENCY_TOP_NUM]:
+        answer += (f"<a href='https://t.me/{config.BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: "
                    f"{round(value[1], 2)}%\n")
     answer += '...\n'
-    for name, value in reversed(list(reversed(pick_freq_top))[:FREQUENCY_TOP_NUM // 2]):
-        answer += (f"<a href='https://t.me/{BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: "
+    for name, value in reversed(list(reversed(pick_freq_top))[:config.FREQUENCY_TOP_NUM // 2]):
+        answer += (f"<a href='https://t.me/{config.BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: "
                    f"{round(value[1], 2)}%\n")
 
     hero_name = None
-    for url_name, data in DOTA2_HEROES.items():
+    for url_name, data in dota2.heroes.items():
         if data[1] == winrate_top[0][0]:
             hero_name = url_name
 

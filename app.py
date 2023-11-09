@@ -4,38 +4,23 @@ from loguru import logger
 import filters
 import middlewares
 import schedulers
-import config
 from handlers import dp
-from utils.notify_admins import on_startup_notify, on_shutdown_notify
+from services import database
 from services.set_bot_commands import set_default_commands
-
-from loader import db
+from utils.notify_admins import on_startup_notify, on_shutdown_notify
 
 
 async def on_startup(dispatcher: Dispatcher):
     filters.setup(dispatcher)
     middlewares.setup(dispatcher)
 
-    try:
-        logger.info(f"Установка подключения PostgreSQL ({config.POSTGRE_URI})")
-        await db.set_bind(config.POSTGRE_URI)
-        await db.gino.create_all()
-    except Exception as e:
-        logger.error(f"Ошибка подключения PostgreSQL ({e})")
-
+    await database.setup_connection()
     await on_startup_notify(dispatcher)
     await set_default_commands(dispatcher)
 
 
 async def on_shutdown(dispatcher: Dispatcher):
-    bind = db.pop_bind()
-    if bind:
-        try:
-            logger.info("Закрытие подключения PostgreSQL")
-            await bind.close()
-        except Exception as e:
-            logger.error(f"Ошибка закрытия подключения PostgreSQL ({e})")
-
+    await database.close_connection()
     await on_shutdown_notify(dispatcher)
 
 

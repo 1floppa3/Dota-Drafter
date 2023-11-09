@@ -8,10 +8,10 @@ from loguru import logger
 from filters import AdminCommand
 from keyboards.mailing import ikb_mailing_add_next_quit, ikb_mailing_next_quit, ikb_mailing_quit
 from loader import dp
-from states import BotMailingState
-from utils.notify_admins import log_to_admins
 from services.db_commands import base_commands as db_base
 from services.db_commands import users as db_users
+from states import BotMailingState
+from utils.notify_admins import log_to_admins
 
 
 @dp.message_handler(AdminCommand(), commands=['mailing'])
@@ -39,7 +39,7 @@ async def start_mailing(call: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(text='add_photo', state=BotMailingState.state)
 async def callback_add_photo(call: types.CallbackQuery):
-    await call.message.answer('Пришлите фото')
+    await call.answer('Пришлите фото')
     await BotMailingState.photo.set()
 
 
@@ -72,7 +72,7 @@ async def no_photo(message: types.Message):
                            state=[BotMailingState.text, BotMailingState.photo, BotMailingState.state])
 async def quit_mailing(call: types.CallbackQuery, state: FSMContext):
     await state.finish()
-    await call.message.answer("Рассылка отменена")
+    await call.answer("Рассылка отменена")
 
 
 async def proccess_mailing(call: types.CallbackQuery, text: str, photo=None):

@@ -6,7 +6,7 @@ from pathlib import Path
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
-import config
+from data import config
 
 ikb_allowed_heroes = InlineKeyboardMarkup(row_width=2).add(
     InlineKeyboardButton(text="Список героев", url=config.HERO_NAMES_URL_LINK)
@@ -23,9 +23,14 @@ def get_ikb_wronghero(wrong_hero: str, heroes: list[str]) -> InlineKeyboardMarku
     }
 
     filename = ''.join(random.choices(string.ascii_lowercase + string.digits, k=30)) + '.json'
-    path = Path(f"handlers/users/pick_tempfiles/{filename}")
-    with open(path, 'w') as file:
-        json.dump(data, file, indent=4)
+    path = Path(f"temp/pick/{filename}")
+    Path('temp/pick/').mkdir(parents=True, exist_ok=True)
+
+    try:
+        with open(path, 'w') as file:
+            json.dump(data, file, indent=4)
+    except FileNotFoundError:
+        pass
 
     ikb = InlineKeyboardMarkup(row_width=2).add(
         InlineKeyboardButton(text="Список героев", url=config.HERO_NAMES_URL_LINK)

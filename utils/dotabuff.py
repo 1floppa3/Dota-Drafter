@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from pprint import pprint
 
 import bs4
 import pandas as pd
@@ -8,14 +7,14 @@ import requests
 from fake_useragent import UserAgent
 from loguru import logger
 
-from data.dota2_heroes import DOTA2_HEROES
+from data import dota2
 from utils.exceptions import NotEnoughHeroesToAnalyze, WrongHero
 
 
 def match_hero_name(user_hero: str) -> str:
     user_hero = ''.join(filter(str.isalnum, user_hero.lower()))
 
-    for url_name, data in DOTA2_HEROES.items():
+    for url_name, data in dota2.heroes.items():
         if user_hero in data[2:] or user_hero == url_name:
             return url_name
     return user_hero
@@ -23,7 +22,7 @@ def match_hero_name(user_hero: str) -> str:
 
 def check_valid_heroes(heroes: list[str]):
     for hero in heroes:
-        if hero not in list(DOTA2_HEROES.keys()):
+        if hero not in list(dota2.heroes.keys()):
             raise WrongHero(hero)
 
 
@@ -213,20 +212,20 @@ def find_counter_picks(heroes: list[str]) -> dict[str, float]:
 
     result = {}
     for hero, data in parse_hero_data(heroes[0]).items():
-        if hero not in [full_name[1] for full_name in DOTA2_HEROES.values()]:
+        if hero not in [full_name[1] for full_name in dota2.heroes.values()]:
             continue
         result[hero] = data[0]
 
     for i in range(1, len(heroes)):
         cur_hero = {}
         for hero, data in parse_hero_data(heroes[i]).items():
-            if hero not in [full_name[1] for full_name in DOTA2_HEROES.values()]:
+            if hero not in [full_name[1] for full_name in dota2.heroes.values()]:
                 continue
             cur_hero[hero] = data[0]
 
         result = {k: result.get(k, 0) + cur_hero.get(k, 0) for k in result}
 
-    for url_name, data in DOTA2_HEROES.items():
+    for url_name, data in dota2.heroes.items():
         if url_name in heroes and data[1] in result:
             del result[data[1]]
 
@@ -243,7 +242,7 @@ def rm_hero_winrate(res: dict[str, list[float, float]]) -> dict[str, float]:
 
 def determine_match_winner(first_team: list[str], second_team: list[str]):
     temp = []
-    for url_name, data in DOTA2_HEROES.items():
+    for url_name, data in dota2.heroes.items():
         if url_name in second_team:
             temp.append(data[1].strip())
 
