@@ -32,8 +32,20 @@ class TimedBaseModel(BaseModel):
     )
 
 
+class Payments(BaseModel):
+    __tablename__ = 'payments'
+
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    is_active = sa.Column(sa.Boolean, default=True)
+    paid = sa.Column(sa.Boolean, default=False)
+    user_id = sa.Column(sa.Integer)
+
+    query: sa.sql.select
+
+
 class Users(TimedBaseModel):
     __tablename__ = 'users'
+
     user_id = sa.Column(sa.Integer, primary_key=True)
     is_active = sa.Column(sa.Boolean, default=True)
     is_sub = sa.Column(sa.Boolean, default=False)

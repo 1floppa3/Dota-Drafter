@@ -1,5 +1,5 @@
-from models.models import Users
 from services.database import db
+from services.db_models.models import Users
 
 
 async def add_user(user_id: int, username: str = None, name: str = None):

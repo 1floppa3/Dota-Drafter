@@ -6,7 +6,7 @@ import services.db_commands.subscription as db_sub
 import services.db_commands.users as db_users
 from data import config
 from filters import UserCommand
-from keyboards.payment import get_ikb_payment
+from keyboards.payment import ikb_payment_offer
 from loader import dp
 from utils.misc.throttling import rate_limit
 
@@ -39,8 +39,7 @@ async def command_meta(message: types.Message):
             f"<b>Цена: {config.SUBSCRIBTION_COST_MESSAGE}</b>")
 
     if not await db_sub.is_user_sub(user_id):
-        await message.answer(text, parse_mode=ParseMode.HTML,
-                             reply_markup=get_ikb_payment(config.SUBSCRIBTION_COST_MESSAGE))
+        await message.answer(text, parse_mode=ParseMode.HTML, reply_markup=ikb_payment_offer)
     else:
         await message.answer(text, parse_mode=ParseMode.HTML)
 

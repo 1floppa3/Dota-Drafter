@@ -25,7 +25,7 @@ from utils.misc.throttling import rate_limit
 @dp.message_handler(UserCommand(), commands=['pick', 'p'])
 async def command_pick(message: types.Message, state: FSMContext):
     if not await db_sub.is_user_sub(message.from_user.id):
-        pick_commands_left = await db_users.get_user_max_picks_per_day(message.from_user.id)
+        pick_commands_left = await db_users.get_user_max_picks_per_day(user_id=message.from_user.id)
         if pick_commands_left <= 0:
             await message.answer('🙁 Вы исчерпали лимит бесплатных пиков за сегодня.\n'
                                  'Возвращайтесь завтра или купите подписку и пользуйтесь ботом бесконечно')
@@ -93,7 +93,7 @@ async def proccess_pick_command(message: types.Message, heroes: list[str], state
             await message.answer(text, parse_mode=ParseMode.HTML)
 
         if not await db_sub.is_user_sub(message.from_user.id):
-            num = await db_users.get_user_max_picks_per_day(message.from_user.id) - 1
+            num = await db_users.get_user_max_picks_per_day(user_id=message.from_user.id) - 1
             await db_users.update_user_max_picks_per_day(user_id=message.from_user.id, num=num)
 
 
@@ -188,7 +188,7 @@ async def create_answer(counter_picks: list, heroes: list, user_id: int) -> str:
         user_heroes = temp
 
         if not await db_sub.is_user_sub(user_id):
-            picks_left = await db_users.get_user_max_picks_per_day(user_id) - 1
+            picks_left = await db_users.get_user_max_picks_per_day(user_id=user_id) - 1
         else:
             picks_left = '∞'
         answer = ("<b>Выведен список контр-пиков каждой позиции в порядке убывания по эффективности</b>\n" +

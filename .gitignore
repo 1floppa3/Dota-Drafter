@@ -5,6 +5,8 @@ dist/
 _versions/
 data/dota2_heroes_stats
 temp/
+migration/
 .env
 logs*.log*
 data/heroes_meta.json
+alembic.ini

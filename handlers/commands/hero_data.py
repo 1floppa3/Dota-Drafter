@@ -135,7 +135,7 @@ async def callback_hero_talents(call: types.CallbackQuery, callback_data: dict):
 
 @dp.callback_query_handler(hero_counters_cb_data.filter())
 async def callback_hero_counters(call: types.CallbackQuery, callback_data: dict):
-    if not await db_sub.is_user_sub(call.from_user.id):
+    if not await db_sub.is_user_sub(call.from_user.id) and not str(call.from_user.id) in config.BOT_ADMINS:
         await call.answer("🙁 Данная команда доступна только для людей, оформивших платную подписку на бот.\n"
                           "Подробнее о подписке: /sub")
         return
@@ -143,6 +143,7 @@ async def callback_hero_counters(call: types.CallbackQuery, callback_data: dict)
     url_name = callback_data['url_name']
 
     text = f"<i><b>{dota2.heroes[url_name][1]}</b>: Контр-пики</i>\n\n"
+    # TODO доделать к проду
 
     await call.message.edit_caption(text, parse_mode=ParseMode.HTML, reply_markup=get_ikb_back_to_hero(url_name))
 

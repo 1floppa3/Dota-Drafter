@@ -8,7 +8,7 @@ async def kb_main_menu(user_id: int) -> ReplyKeyboardMarkup:
     kb = ReplyKeyboardMarkup(resize_keyboard=True, is_persistent=True, input_field_placeholder=config.BOT_NAME)
 
     row = [KeyboardButton("👀 Контрпикнуть команду")]
-    if await db_sub.is_user_sub(user_id) or str(user_id) in config.BOT_ADMINS:
+    if await db_sub.is_user_sub(user_id):
         row.append(KeyboardButton("[SUB] Анализ пиков команд"))
     kb.add(*row)
 

@@ -3,10 +3,11 @@ from datetime import datetime
 from aiogram import types, Dispatcher
 from loguru import logger
 
-from models.models import Users
 from services.db_commands import base_commands as db_base
+from services.db_commands import subscription as db_sub
+from services.db_models.models import Users
 from utils.exceptions import UserNotFound
-from utils.notify_admins import notify_new_user
+from utils.notify_admins import notify_new_user, log_to_admins
 
 
 async def update_user(dp: Dispatcher, message: types.Message):
@@ -23,6 +24,14 @@ async def update_user(dp: Dispatcher, message: types.Message):
                           username=message.from_user.username,
                           name=message.from_user.full_name,
                           command_count=command_count + 1).apply()
+
+        if await db_sub.is_sub_expires(message.from_user.id):
+            await db_sub.remove_sub(message.from_user.id)
+            await dp.bot.send_message(message.from_user.id, "📄 Время действия вашей подписки закончилось :(")
+            await log_to_admins(dp, "📄 У пользователя "
+                                    f"(<a href='tg://user?id={message.from_user.id}'>{message.from_user.full_name}</a> "
+                                    f"(@{message.from_user.username}) #{message.from_user.id}) "
+                                    "истекла подписка.", log=False)
     except UserNotFound:
         await add_new_user(dp, message)
     except Exception as e:
@@ -56,8 +65,9 @@ async def get_user_created_date(user_id: int) -> datetime:
     return user.created_at
 
 
-async def get_user_max_picks_per_day(user_id: int) -> int:
-    user = await db_base.select_user(user_id)
+async def get_user_max_picks_per_day(*, user: Users = None, user_id: int = 0) -> int:
+    if user is None:
+        user = await db_base.select_user(user_id)
     return user.max_picks_per_day
 
 

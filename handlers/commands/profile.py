@@ -4,9 +4,8 @@ from loguru import logger
 
 import services.db_commands.subscription as db_sub
 import services.db_commands.users as db_users
-from data import config
 from filters import UserCommand
-from keyboards.payment import get_ikb_payment
+from keyboards.payment import ikb_payment_offer
 from loader import dp
 from utils.misc.throttling import rate_limit
 
@@ -30,13 +29,13 @@ async def command_profile(message: types.Message):
             f"📅 Начался пользоваться ботом: {created_at}\n"
             "\n"
             f"<i>Отправлено команд боту: <b>{await db_users.get_user_command_count(user_id)}\n</b></i>"
-            f"<i>Осталось бесплатных пиков сегодня: <b>{await db_users.get_user_max_picks_per_day(user_id)}\n</b></i>"
+            f"<i>Осталось бесплатных пиков сегодня: "
+            f"<b>{await db_users.get_user_max_picks_per_day(user_id=user_id)}\n</b></i>"
             "\n"
             f"<i>💵 Подписка: <b>{sub_expires_date}</b> (/sub)</i>")
 
     if not await db_sub.is_user_sub(user_id):
-        await message.answer(text, parse_mode=ParseMode.HTML,
-                             reply_markup=get_ikb_payment(config.SUBSCRIBTION_COST_MESSAGE))
+        await message.answer(text, parse_mode=ParseMode.HTML, reply_markup=ikb_payment_offer)
     else:
         await message.answer(text, parse_mode=ParseMode.HTML)
 

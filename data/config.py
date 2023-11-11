@@ -20,7 +20,7 @@ BOT_ADMINS = [
 
 # Links
 CHANNEL_LINK = "@dotadrafter"
-BOT_LINK = "@testfloppa13bot"  # поменять
+BOT_LINK = "@testfloppa13bot"  # TODO поменять в проде
 HERO_NAMES_URL_LINK = "https://telegra.ph/Aliasy-k-nazvaniyam-geroev-DOTA-DRAFTER-11-03"
 
 # Misc
@@ -44,8 +44,12 @@ FREQUENCY_TOP_NUM = 10  # Count of heroes in Frequency meta
 
 # Subscription
 SUBSCRIBTION_COST_RUB = 199
-SUBSCRIBTION_COST_USD = 2
-SUBSCRIBTION_COST_MESSAGE = f"{SUBSCRIBTION_COST_USD}$ ({SUBSCRIBTION_COST_RUB}₽) / мес"
+SUBSCRIBTION_DAYS = 30
+SUBSCRIBTION_COST_MESSAGE = f"{SUBSCRIBTION_COST_RUB}₽/{SUBSCRIBTION_DAYS}дн"
+PAYOK_SHOP_ID = "9101"
+PAYOK_SHOP_KEY = os.getenv('PAYOK_SHOP_KEY')  # TODO добавить в енв в проде
+PAYOK_API_ID = "4606"
+PAYOK_API_KEY = os.getenv('PAYOK_API_KEY')  # TODO добавить в енв в проде
 
 # Database
 DATABASE = {
