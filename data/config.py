@@ -50,6 +50,7 @@ PAYOK_SHOP_ID = "9101"
 PAYOK_SHOP_KEY = os.getenv('PAYOK_SHOP_KEY')  # TODO добавить в енв в проде
 PAYOK_API_ID = "4606"
 PAYOK_API_KEY = os.getenv('PAYOK_API_KEY')  # TODO добавить в енв в проде
+# TODO сразу после прода сделать скипнуть 10 индексов в БД (чтобы не было конфликтов с payok)
 
 # Database
 DATABASE = {

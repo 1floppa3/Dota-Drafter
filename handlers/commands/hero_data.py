@@ -11,7 +11,7 @@ from keyboards.hero_data import (get_ikb_hero_data, hero_skills_cb_data, hero_ta
 from keyboards.heroes_pagination import get_ikb_heroes_pagination
 from loader import dp
 from services.db_commands import subscription as db_sub
-from utils.dotabuff import parse_hero_data, parse_meta_data
+from utils.dotabuff import parse_hero_data, parse_meta_data, match_hero_name
 from utils.misc.throttling import rate_limit
 
 
@@ -93,6 +93,34 @@ def hero_skills_pagination(url_name: str, skill_num: int) -> (str, int):
     return text, len(hero_skills)
 
 
+def hero_counters_message(url_name: str):
+    text = f"<i><b>{dota2.heroes[url_name][1]}</b>: Контр-пики</i>\n\n"
+
+    hero_data = parse_hero_data(url_name)
+
+    lose_rate = {}
+    for hero, data in hero_data.items():
+        if hero not in [full_name[1] for full_name in dota2.heroes.values()]:
+            continue
+        lose_rate[hero] = data[0]
+    # print(lose_rate)
+
+    best_counters = list(lose_rate.items())
+    worst_counters = list(reversed(list(lose_rate.items())))
+
+    text += "<i>Хорош против:</i>\n"
+    for name, rate in worst_counters[:config.COUNTERPICK_NUM * 2]:
+        rate = f"{round(rate * -5, 2)}%"
+        text += f"<a href='https://t.me/{config.BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: {rate}\n"
+
+    text += "\n<i>Плох против:</i>\n"
+    for name, rate in best_counters[:config.COUNTERPICK_NUM * 2]:
+        rate = f"{round(rate * -5, 2)}%"
+        text += f"<a href='https://t.me/{config.BOT_LINK[1:]}?start={match_hero_name(name)}'>{name}</a>: {rate}\n"
+
+    return text
+
+
 @dp.callback_query_handler(hero_skills_cb_data.filter())
 async def callback_hero_skills(call: types.CallbackQuery, callback_data: dict):
     url_name = callback_data['url_name']
@@ -142,8 +170,7 @@ async def callback_hero_counters(call: types.CallbackQuery, callback_data: dict)
 
     url_name = callback_data['url_name']
 
-    text = f"<i><b>{dota2.heroes[url_name][1]}</b>: Контр-пики</i>\n\n"
-    # TODO доделать к проду
+    text = hero_counters_message(url_name)
 
     await call.message.edit_caption(text, parse_mode=ParseMode.HTML, reply_markup=get_ikb_back_to_hero(url_name))
 
