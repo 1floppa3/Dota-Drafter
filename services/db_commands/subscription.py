@@ -19,7 +19,6 @@ async def sub_expires_date(user_id: int) -> datetime:
 async def give_sub(user_id: int) -> datetime:
     user = await db_base.select_user(user_id)
     date = datetime.utcnow().replace(tzinfo=pytz.UTC) + timedelta(days=config.SUBSCRIBTION_DAYS)
-    date = datetime.utcnow().replace(tzinfo=pytz.UTC) + timedelta(minutes=2)
     await user.update(is_sub=True, sub_expires=date).apply()
     return date
 
